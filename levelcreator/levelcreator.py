@@ -11,7 +11,8 @@ def help():
 def flatten(ar):
     newar = []
     for row in ar:
-        newar.append([row[0][0].item(), row[0][1].item()])
+        newar.append(row[0][0].item())
+        newar.append(row[0][1].item())
     return newar
 
 def main():
