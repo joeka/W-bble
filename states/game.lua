@@ -14,7 +14,7 @@ end
 
 function game:keypressed( key )
 	if key == "escape" then
-		gamestate.switch( states.title )
+		gamestate.pop(states.title)
 	end
 end
 
