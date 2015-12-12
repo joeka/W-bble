@@ -138,7 +138,7 @@ function player:render()
 	love.graphics.draw(self.image,
 					   self.physObj.body:getX() - self.physObj.shape:getRadius(), 
 					   self.physObj.body:getY() - self.physObj.shape:getRadius(),
-					   0,
+					   self.physObj.body:getAngle(),
 					   figure_scale_x,
 					   figure_scale_y)
 
