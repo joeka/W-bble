@@ -3,6 +3,7 @@ local player = {}
 local world = {}
 local debug = true
 
+
 function game:init()
 	font = love.graphics.newImageFont("img/font.png",
 								      " abcdefghijklmnopqrstuvwxyz" ..
@@ -14,7 +15,7 @@ function game:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png", format)
 	world = love.physics.newWorld(0, 200, true)
 	player:init()
-	self:load_level("")
+	self:load_level(1)
 end
 
 function game:load_level(lvl)
@@ -23,6 +24,16 @@ function game:load_level(lvl)
 	self.static.s = love.physics.newRectangleShape(200, 50)
 	self.static.f = love.physics.newFixture(self.static.b, self.static.s)
 	self.static.f:setUserData("Block")
+
+	self.lines = {}
+	for i, polygon in pairs(levels[lvl].lines) do
+		local line = {}
+		line.points = polygon
+		line.shape = love.physics.newChainShape(true, polygon)
+		line.body = love.physics.newBody(world, 0, 0, "static")
+		line.fixture = love.physics.newFixture(line.body, line.shape, 1)
+		table.insert(self.lines, line)
+	end
 end
 
 function game:init_color()
@@ -76,7 +87,12 @@ function game:draw()
 	player:render()
 
 	love.graphics.setColor(0, 0, 0)
-	love.graphics.polygon("line", self.static.b:getWorldPoints(self.static.s:getPoints()))	
+	love.graphics.polygon("line", self.static.b:getWorldPoints(self.static.s:getPoints()))
+
+	--debug stuff
+	for i,line in pairs(self.lines) do
+		love.graphics.polygon("line", line.points)
+	end
 end
 
 function player:init()
@@ -85,7 +101,7 @@ function player:init()
 	self.posY = 0
 
 	self.physObj = {}
-	self.physObj.body = love.physics.newBody(world, 400, 100, "dynamic")
+	self.physObj.body = love.physics.newBody(world, 500, 50, "dynamic")
 	self.physObj.body:setMass(1)
 	self:setSize(30)
 
