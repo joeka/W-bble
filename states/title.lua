@@ -1,5 +1,15 @@
 local title = {}
 
+function title:enter()
+	love.graphics.setColor(255,255,255)
+	love.graphics.setBackgroundColor(0, 0, 0)
+end
+
+function title:resume()
+	love.graphics.setColor(255,255,255)
+	love.graphics.setBackgroundColor(0, 0, 0)
+end
+
 function title:draw()
 	love.graphics.print( "press any key" , 100, 100 )
 end
