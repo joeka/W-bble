@@ -1,7 +1,7 @@
 local game = {}
 local player = {}
 local world = {}
-local debug = true
+local debug = false
 
 
 function game:init()
@@ -135,9 +135,11 @@ function player:render()
 	local figure_scale_y = 2 * self.physObj.shape:getRadius() / self.image:getHeight()
 
 	love.graphics.setColor(255, 255, 255)
+
+	local translate = vector(-1,-1):rotateInplace(self.physObj.body:getAngle()) * self.physObj.shape:getRadius()
 	love.graphics.draw(self.image,
-					   self.physObj.body:getX() - self.physObj.shape:getRadius(), 
-					   self.physObj.body:getY() - self.physObj.shape:getRadius(),
+					   self.physObj.body:getX() + translate.x,
+					   self.physObj.body:getY() + translate.y,
 					   self.physObj.body:getAngle(),
 					   figure_scale_x,
 					   figure_scale_y)
