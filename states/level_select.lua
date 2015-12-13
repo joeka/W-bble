@@ -23,7 +23,7 @@ end
 
 function level_select:keypressed( key )
 	if key == "down" then
-		if self.sel_index < #levels  then
+		if self.sel_index < #levels - 1 then
 			self.sel_index = self.sel_index + 1
 		end
 	elseif key == "up" then
@@ -42,12 +42,12 @@ function level_select:draw()
 	love.graphics.print("SELECT LEVEL", LIST_PADDING_LEFT, LIST_PADDING_TOP - 40)
 
 	i = 0
-	for k, v in pairs(levels) do
+	for k, v in ipairs(levels) do
 		if i == self.sel_index then
 			love.graphics.rectangle("fill", LIST_PADDING_LEFT, LIST_PADDING_TOP + i * LIST_ITEM_HEIGHT, 100, LIST_ITEM_HEIGHT)
 			self.sel_key = k
 		end
-		love.graphics.print(k, LIST_PADDING_LEFT, LIST_PADDING_TOP + i * LIST_ITEM_HEIGHT)
+		love.graphics.print(v.title, LIST_PADDING_LEFT, LIST_PADDING_TOP + i * LIST_ITEM_HEIGHT)
 		i = i + 1
 	end
 end
