@@ -75,6 +75,12 @@ function editor:keypressed( key )
 		self.cam:zoom(1.2)
 	elseif key == "-" then
 		self.cam:zoom(1 / 1.2)
+	elseif key == "delete" then
+		local wx, wy = self.cam:mousePosition(x,y)
+		local _, i = self:object_clicked(wx, wy, false)
+		if i then
+			table.remove(self.objects, i)
+		end 
 	end
 end
 
@@ -93,14 +99,20 @@ function editor:move_object(obj)
 	self.moving_object = obj
 end
 
-function editor:object_clicked(x, y)
-	for i, object in ipairs(objects) do
-		if x >= object.x and x <= object.x + object.w
-				and y >= object.y and y <= object.y + object.h then
-			local ox, oy = self.cam:worldCoords(object.x, object.y)
-			local obj = {type = i, x = ox, y = oy, w = object.w, h = object.h}
-			table.insert( self.objects, obj)
-			return obj
+function editor:object_clicked(x, y, create)
+	if create == nil then
+		create = true
+	end
+
+	if create then
+		for i, object in ipairs(objects) do
+			if x >= object.x and x <= object.x + object.w
+					and y >= object.y and y <= object.y + object.h then
+				local ox, oy = self.cam:worldCoords(object.x, object.y)
+				local obj = {type = i, x = ox, y = oy, w = object.w, h = object.h}
+				table.insert( self.objects, obj)
+				return obj, i
+			end
 		end
 	end
 
@@ -108,7 +120,7 @@ function editor:object_clicked(x, y)
 	for i, object in ipairs(self.objects) do
 		if gx >= object.x and gx <= object.x + object.w
 				and gy >= object.y and gy <= object.y + object.h then
-			return object
+			return object, i
 		end
 	end
 end
