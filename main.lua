@@ -11,6 +11,7 @@ function love.load()
 	states.title = require "states.title"
 	states.game = require "states.game"
 	states.editor = require "states.editor"
+	states.level_select = require "states.level_select"
 
 	love.keyboard.setTextInput( false )	--used later in editor_save state
 
