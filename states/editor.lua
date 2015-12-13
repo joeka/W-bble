@@ -197,6 +197,9 @@ function editor:draw()
 		love.graphics.draw(objects[object.type].image, object.x, object.y )
 	end
 
+	love.graphics.setColor(255, 0, 0)
+	love.graphics.rectangle("fill", 500, 50, 10, 10)
+
 	self.cam:detach()
 
 	-- GUI --
