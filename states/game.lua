@@ -152,9 +152,36 @@ function game:draw()
 
 	local bg_scale_x = love.graphics.getWidth() / self.backgroundImage:getWidth()
 	local bg_scale_y = love.graphics.getHeight() / self.backgroundImage:getHeight()
-
+	
 	love.graphics.setColor(255, 255, 255)
-	love.graphics.draw(self.backgroundImage, 0, 0, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+
+	local x,y = self.cam:position()
+	local xm = x % 1280
+	local ym = y % 720
+	love.graphics.draw(self.backgroundImage, x - xm, y - ym, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+
+	if xm < 1280 / 2 then
+		love.graphics.draw(self.backgroundImage, x - xm - 1280, y - ym, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+
+		if ym < 720 / 2 then
+			love.graphics.draw(self.backgroundImage, x - xm - 1280, y - ym - 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+		elseif ym > 720 / 2 then
+			love.graphics.draw(self.backgroundImage, x - xm - 1280, y - ym + 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+		end
+	elseif xm > 1280 / 2 then
+		love.graphics.draw(self.backgroundImage, x - xm + 1280, y - ym, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+
+		if ym < 720 / 2 then
+			love.graphics.draw(self.backgroundImage, x - xm + 1280, y - ym - 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+		elseif ym > 720 / 2 then
+			love.graphics.draw(self.backgroundImage, x - xm + 1280, y - ym + 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+		end
+	end
+	if ym < 720 / 2 then
+		love.graphics.draw(self.backgroundImage, x - xm, y - ym - 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+	elseif ym > 720 / 2 then
+		love.graphics.draw(self.backgroundImage, x - xm, y - ym + 720, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+	end
 	
 	player:render()
 

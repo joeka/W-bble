@@ -1,5 +1,5 @@
 local title = {}
-
+title.text = "press any key"
 function title:init()
 	music = love.audio.newSource( 'snd/music.wav', 'static' )
 	music:setLooping( true ) --so it doesnt stop
@@ -17,9 +17,10 @@ function title:resume()
 end
 
 function title:draw()
-	love.graphics.print( "press any key" , 100, 100 )
+	love.graphics.print( self.text , 100, 100 )
 end
 
+local fail_counter = 0
 function title:keypressed( key )
 	if key == "escape" then
 		love.event.push('quit')
@@ -29,6 +30,12 @@ function title:keypressed( key )
 		gamestate.push (states.level_select)
 	elseif key == "return" then
 		gamestate.push (states.game)
+	else
+		fail_counter = fail_counter + 1
+
+		if fail_counter > 5 then
+			self.text = "maybe try enter"
+		end
 	end
 end
 
