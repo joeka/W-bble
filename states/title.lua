@@ -1,9 +1,9 @@
 local title = {}
 
 function title:init()
-	-- music = love.audio.newSource( 'snd/music.wav', 'static' )
-	-- music:setLooping( true ) --so it doesnt stop
-	-- music:play()
+	music = love.audio.newSource( 'snd/music.wav', 'static' )
+	music:setLooping( true ) --so it doesnt stop
+	music:play()
 end
 
 function title:enter()
