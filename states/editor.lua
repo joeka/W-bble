@@ -5,14 +5,26 @@ local utf8 = require("utf8")
 
 local min_dist = 5
 
+local objects = require ("objects")
+
 function editor:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
 
 	love.filesystem.createDirectory( "levels" )
+
+	objects:load_images()
+	local w, h = love.window.getDimensions()
+	local y = 30
+	for i, object in ipairs(objects) do
+		object.x = w - 110
+		object.y = y
+		y = y + object.h
+	end
 end
 
 function editor:enter()
 	editor.lines = {}
+	editor.objects = {}
 	self.current_point = nil
 	self.current_line = {}
 	self.drawing = false
@@ -34,12 +46,17 @@ function editor:update(dt)
 		self.cam:move(self.current_pos.x - love.mouse.getX(), self.current_pos.y - love.mouse.getY())
 		self.current_pos = vector(love.mouse.getX(), love.mouse.getY())
 	elseif self.drawing then
-		local wx, wy = self.cam:worldCoords( love.mouse.getPosition() )
+		local wx, wy = self.cam:mousePosition()
 		if self.current_point:dist(vector(wx,wy)) > min_dist then
 			table.insert(self.current_line, wx)
 			table.insert(self.current_line, wy)
 			self.current_point = vector(wx,wy)
 		end
+	elseif self.moving_object then
+		local wx, wy = self.cam:mousePosition()
+		self.moving_object.x = self.moving_object.x + (wx - self.current_point.x)
+		self.moving_object.y = self.moving_object.y + (wy - self.current_point.y)
+		self.current_point = vector(wx, wy)
 	end
 end
 
@@ -66,19 +83,49 @@ function editor:preview()
 		table.insert(levels, {title = "preview", lines = self.lines})
 		self.level_id = #levels
 	else
-		levels[self.level_id] = {title = "preview", lines = self.lines}
+		levels[self.level_id] = {title = "preview", lines = self.lines, objects = self.objects}
 	end
 	states.game:load_level(self.level_id)
 	gamestate.push(states.game)
 end
 
+function editor:move_object(obj)
+	self.moving_object = obj
+end
+
+function editor:object_clicked(x, y)
+	for i, object in ipairs(objects) do
+		if x >= object.x and x <= object.x + object.w
+				and y >= object.y and y <= object.y + object.h then
+			local ox, oy = self.cam:worldCoords(object.x, object.y)
+			local obj = {type = i, x = ox, y = oy, w = object.w, h = object.h}
+			table.insert( self.objects, obj)
+			return obj
+		end
+	end
+
+	local gx, gy = self.cam:worldCoords(x, y)
+	for i, object in ipairs(self.objects) do
+		if gx >= object.x and gx <= object.x + object.w
+				and gy >= object.y and gy <= object.y + object.h then
+			return object
+		end
+	end
+end
+
 function editor:mousepressed(x, y, button)
 	if button == "l" then
 		local wx, wy = self.cam:worldCoords(x,y)
-		table.insert(self.current_line, wx)
-		table.insert(self.current_line, wy)
-		self.current_point = vector(wx, wy)
-		self.drawing = true
+		local obj = self:object_clicked(x, y)
+		if obj then
+			self.current_point = vector(wx,wy)
+			self:move_object(obj)
+		else
+			table.insert(self.current_line, wx)
+			table.insert(self.current_line, wy)
+			self.current_point = vector(wx, wy)
+			self.drawing = true
+		end
 	elseif button == "r" then
 		self.current_pos = vector(x,y)
 		self.moving = true
@@ -89,17 +136,25 @@ function editor:mousereleased(x, y, button)
 	if button == "l" then
 		local wx, wy = self.cam:worldCoords(x,y)
 
-		if self.current_point:dist(vector(wx,wy)) > min_dist then
-			table.insert(self.current_line, wx)
-			table.insert(self.current_line, wy)
+		if self.moving_object then
+			self.moving_object.x = self.moving_object.x + (wx - self.current_point.x)
+			self.moving_object.y = self.moving_object.y + (wy - self.current_point.y)
+			self.moving_object = nil
+			current_point = nil
+		elseif self.drawing then
+
+			if self.current_point:dist(vector(wx,wy)) > min_dist then
+				table.insert(self.current_line, wx)
+				table.insert(self.current_line, wy)
+			end
+			
+			self.current_point = nil
+			self.drawing = false
+			if #self.current_line >= 4 then
+				table.insert( self.lines, self.current_line )
+			end
+			self.current_line = {}
 		end
-		
-		self.current_point = nil
-		self.drawing = false
-		if #self.current_line >= 4 then
-			table.insert( self.lines, self.current_line )
-		end
-		self.current_line = {}
 	elseif button == "r" then
 		self.moving = false
 		self.cam:move(self.current_pos.x - x, self.current_pos.y - y)
@@ -126,7 +181,19 @@ function editor:draw()
 		love.graphics.line(self.current_line)
 	end
 
+	for i, object in ipairs(self.objects) do
+		love.graphics.draw(objects[object.type].image, object.x, object.y )
+	end
+
 	self.cam:detach()
+
+	-- GUI --
+	love.graphics.setColor( 255, 255, 255, 50 )
+	local w, h = love.window.getDimensions()
+	love.graphics.rectangle( "fill", w - 120,  20, 100, h - 40 )
+	for i, object in ipairs(objects) do
+		love.graphics.draw(object.image, object.x, object.y )
+	end
 end
 
 
@@ -186,10 +253,10 @@ end
 function editor_save:save()
 	love.filesystem.write( "levels/" .. self.title .. ".lvl", self:create_level() )
 	if not states.editor.level_id then
-		table.insert(levels, {title = self.title, lines = states.editor.lines})
+		table.insert(levels, {title = self.title, lines = states.editor.lines, objects = states.editor.objects})
 		states.editor.level_id = #levels
 	else
-		levels[states.editor.level_id] = {title = self.title, lines = states.editor.lines}
+		levels[states.editor.level_id] = {title = self.title, lines = states.editor.lines, objects = states.editor.objects}
 	end
 	gamestate.pop()
 end
@@ -199,12 +266,22 @@ function editor_save:create_level()
 					.."title = \"" .. self.title .. "\",\n"
 					.."lines = { \n"
 
-	for i, line in pairs( states.editor.lines ) do
+	for i, line in ipairs( states.editor.lines ) do
 		level_txt = level_txt .. "{ "
 		for j, value in pairs( line ) do
 			level_txt = level_txt .. value .. ", "
 		end
 		level_txt = level_txt .. " },\n"
+	end
+
+	level_txt = level_txt .. "},\nobjects = {"
+
+	for i, object in ipairs( states.editor.objects ) do
+		level_txt = level_txt .. " {type = " .. object.type .. ", "
+		level_txt = level_txt .. "x = " .. object.x .. ", "
+		level_txt = level_txt .. "y = " .. object.y .. ", "
+		level_txt = level_txt .. "w = " .. object.w .. ", " 
+		level_txt = level_txt .. "h = " .. object.h .. "}, "
 	end
 
 	level_txt = level_txt .. "}\n}"
