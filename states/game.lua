@@ -41,7 +41,9 @@ function game:init()
 	end
 
 	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
-	self.ps:setPosition(ass_pos.x, ass_pos.y) 
+	self.ps:setPosition(ass_pos.x, ass_pos.y)
+
+	self.timer = 0
 end
 
 function game:reset()
@@ -50,6 +52,8 @@ function game:reset()
 	player.physObj.body:setLinearVelocity(0,0)
 	player.physObj.body:setAngularVelocity(0)
 	self.cam:lookAt(unpack(initial_position))
+
+	self.timer = 0
 end
 
 function game:load_level(lvl)
@@ -104,6 +108,8 @@ function game:resume()
 end
 
 function game:update(dt)
+	self.timer = self.timer + dt
+
 	if debug then
 	    if love.keyboard.isDown("l") then
 	        player.physObj.body:applyForce(10000, 0)
@@ -209,6 +215,8 @@ function game:draw()
 	)
 
 	self.cam:detach()
+	local w, h = love.window.getDimensions()
+	love.graphics.print(self.timer, w - 190, 20 )
 end
 
 function objectForFixture(fix)
