@@ -99,7 +99,6 @@ function game:draw()
 	love.graphics.setLineWidth( linewidth )
 
 	for i,line in pairs(self.lines) do
-		print(#line)
 		love.graphics.line(line.points)
 	end
 end
