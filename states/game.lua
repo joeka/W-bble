@@ -1,9 +1,10 @@
 local game = {}
 local player = {}
+local objects = require ("objects")
 local world = nil
 local debug = false
 
-local PLAYER_MAX_SIZE = 60
+local PLAYER_MAX_SIZE = 100
 local PLAYER_MIN_SIZE = 20
 
 -- ###########################################################################################
@@ -24,6 +25,8 @@ function game:init()
 	self.ps:setLinearAcceleration(-20, 20, 20, 30) -- Random movement in all directions.
 	self.ps:setColors(255, 255, 255, 255, 255, 255, 255, 0) -- Fade to transparency.
 	
+	objects:load_images()
+
 	if not world then
 		self:load_level(default_lvl)
 	end
@@ -31,6 +34,7 @@ end
 
 function game:load_level(lvl)
 	world = love.physics.newWorld(0, 200, true)
+	world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 	self.lines = {}
 	for i, polygon in pairs(levels[lvl].lines) do
@@ -41,6 +45,17 @@ function game:load_level(lvl)
 		line.fixture = love.physics.newFixture(line.body, line.shape, 1)
 		
 		table.insert(self.lines, line)
+	end
+
+	self.physicalObjects = {}
+
+	for i, k in pairs(levels[lvl].objects) do
+		local obj = {}
+		obj.body = love.physics.newBody(world, k.x, k.y, "static")
+		obj.shape = love.physics.newRectangleShape(k.w, k.h)
+		obj.fixture = love.physics.newFixture(obj.body, obj.shape, 1)
+		obj.type = k.type
+		table.insert(self.physicalObjects, obj)
 	end
 
 	player:init()
@@ -129,6 +144,10 @@ function game:draw()
 		love.graphics.line(line.points)
 	end
 
+	for i,k in pairs(self.physicalObjects) do
+		love.graphics.draw(objects[k.type].image, k.body:getX(), k.body:getY(), 0, 1, 1)
+	end
+
 	local ass_pos = vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
 
 	love.graphics.draw(
@@ -139,6 +158,42 @@ function game:draw()
 
 	self.cam:detach()
 end
+
+function objectForFixture(fix)
+	for i, k in pairs(states.game.physicalObjects) do
+		if (fix == k.fixture) then
+			return k
+		end
+	end
+	return nil
+end
+
+function beginContact(a, b, coll)
+ 	obj = objectForFixture(a)
+ 	if obj == nil then
+ 		obj = objectForFixture(b)
+ 		if obj == nil then
+ 			return
+ 		end
+ 	end
+
+ 	if objects[obj.type].name == "flagge" then
+ 		gamestate.pop()
+ 	end
+end
+ 
+function endContact(a, b, coll)
+ 
+end
+ 
+function preSolve(a, b, coll)
+ 
+end
+ 
+function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
+ 
+end
+
 
 -- ###########################################################################################
 -- ###########################################################################################
