@@ -178,12 +178,6 @@ end
 function editor:draw()
 	self.cam:attach()
 
-	local bg_scale_x = love.graphics.getWidth() / self.backgroundImage:getWidth()
-	local bg_scale_y = love.graphics.getHeight() / self.backgroundImage:getHeight()
-
-	love.graphics.setColor(255, 255, 255)
-	love.graphics.draw(self.backgroundImage, 0, 0, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
-
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.setLineStyle( "smooth" )
 	love.graphics.setLineWidth( 10 )
