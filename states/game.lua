@@ -67,22 +67,22 @@ end
 
 function game:update(dt)
 	if debug then
-	    if love.keyboard.isDown("right") then
+	    if love.keyboard.isDown("l") then
 	        player.physObj.body:applyForce(10000, 0)
-	    elseif love.keyboard.isDown("left") then
+	    elseif love.keyboard.isDown("j") then
 	        player.physObj.body:applyForce(-10000, 0) 
 	    end
 
-	    if love.keyboard.isDown("up") then
+	    if love.keyboard.isDown("i") then
 	        player.physObj.body:applyForce(0, -10000)
-	    elseif love.keyboard.isDown("down") then
+	    elseif love.keyboard.isDown("k") then
 	        player.physObj.body:applyForce(0, 10000)
 	    end
 	end
 
-    if love.keyboard.isDown("+") then
+    if love.keyboard.isDown("+") or love.keyboard.isDown("up")then
     	player:setSize(player:getSize() + 1)
-    elseif love.keyboard.isDown("-") then
+    elseif love.keyboard.isDown("-") or love.keyboard.isDown("down")then
     	player:setSize(player:getSize() - 1)
     end
 
