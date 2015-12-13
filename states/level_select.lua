@@ -8,9 +8,12 @@ local LIST_ITEM_COUNT = 10
 
 local list_min_index = 0
 
+local dancer = require("dancer")
+
 function level_select:init()
 	self.sel_index = 0
 	self.sel_key = nil
+	dancer:init()
 end
 
 function level_select:enter()
@@ -23,7 +26,7 @@ function level_select:resume()
 end
 
 function level_select:update(dt)
-
+	dancer:update(dt)
 end
 
 function level_select:keypressed( key )
@@ -76,6 +79,8 @@ function level_select:draw()
 		end
 		i = i + 1
 	end
+
+	dancer:draw()
 end
 
 return level_select
