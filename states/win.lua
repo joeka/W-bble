@@ -1,11 +1,13 @@
 local win = {}
+local music = require("background_music")
 
 function win:init()
 	self.armsImage = love.graphics.newImage("img/kreide_figur_arme.png")
 end
 
 function win:enter()
-	
+	music:stop()
+	music:play()
 end
 
 function win:resume()
@@ -14,7 +16,7 @@ function win:resume()
 end
 
 function win:update(dt)
-
+	music.update()
 end
 
 function win:keypressed( key )

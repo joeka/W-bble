@@ -3,6 +3,7 @@ local player = {}
 local objects = require ("objects")
 local world = nil
 local debug = false
+local music = require("background_music")
 
 local PLAYER_MAX_SIZE = 100
 local PLAYER_MIN_SIZE = 20
@@ -18,6 +19,8 @@ local linewidth = 20
 local default_lvl = 1
 
 function game:init()
+	music:init()
+
 	self.backgroundImage = love.graphics.newImage("img/background.png")
 	self.particleImage = love.graphics.newImage('img/particle.png')
 	self.ps = love.graphics.newParticleSystem(self.particleImage, 400)
@@ -75,6 +78,9 @@ function game:load_level(lvl)
 		table.insert(self.physicalObjects, obj)
 	end
 
+	music:stop()
+	music:play()
+
 	player:init()
 	self:init_camera()
 end
@@ -130,6 +136,7 @@ function game:update(dt)
 
 	world:update(dt)
 	player:update(dt)
+	music:update()
 
 	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
 	self.ps:setPosition(ass_pos.x, ass_pos.y) 
