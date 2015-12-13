@@ -54,6 +54,10 @@ function editor:keypressed( key )
 		if #self.lines > 0 then
 			table.remove(self.lines)
 		end
+	elseif key == "+" then
+		self.cam:zoom(1.2)
+	elseif key == "-" then
+		self.cam:zoom(1 / 1.2)
 	end
 end
 
