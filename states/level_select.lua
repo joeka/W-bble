@@ -2,14 +2,18 @@ local level_select = {}
 
 local LIST_PADDING_LEFT = 100
 local LIST_PADDING_TOP = 100
+local LIST_WIDTH = 300
 local LIST_ITEM_HEIGHT = 15
 local LIST_ITEM_COUNT = 10
 
 local list_min_index = 0
 
+local dancer = require("dancer")
+
 function level_select:init()
 	self.sel_index = 0
 	self.sel_key = nil
+	dancer:init()
 end
 
 function level_select:enter()
@@ -22,7 +26,7 @@ function level_select:resume()
 end
 
 function level_select:update(dt)
-
+	dancer:update(dt)
 end
 
 function level_select:keypressed( key )
@@ -62,19 +66,21 @@ function level_select:draw()
 	local din_start = din_start_percent * bar_height
 	local din_end = din_end_percent * bar_height
 
-	love.graphics.rectangle("fill", LIST_PADDING_LEFT + 110, LIST_PADDING_TOP + din_start, 8, din_end - din_start)
+	love.graphics.rectangle("fill", LIST_PADDING_LEFT + LIST_WIDTH + 10, LIST_PADDING_TOP + din_start, 8, din_end - din_start)
 
 	i = 0
 	for k, v in ipairs(levels) do
 		if i >= list_min_index and i < list_min_index + LIST_ITEM_COUNT then
 			if i == self.sel_index then
-				love.graphics.rectangle("fill", LIST_PADDING_LEFT, LIST_PADDING_TOP + (i - list_min_index) * LIST_ITEM_HEIGHT, 100, LIST_ITEM_HEIGHT)
+				love.graphics.rectangle("fill", LIST_PADDING_LEFT, LIST_PADDING_TOP + (i - list_min_index) * LIST_ITEM_HEIGHT, LIST_WIDTH, LIST_ITEM_HEIGHT)
 				self.sel_key = k
 			end
 			love.graphics.print(v.title, LIST_PADDING_LEFT, LIST_PADDING_TOP + (i - list_min_index) * LIST_ITEM_HEIGHT)
 		end
 		i = i + 1
 	end
+
+	dancer:draw()
 end
 
 return level_select

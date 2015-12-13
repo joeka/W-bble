@@ -29,6 +29,7 @@ function game:init()
 	
 	self.sounds = {  }
 	self.sounds["bip"] = love.audio.newSource("snd/bip.wav", "static")
+	self.sounds["yippi"] = love.audio.newSource("snd/yippi.wav", "static")
 
 	objects:load_images()
 
@@ -230,10 +231,13 @@ function beginContact(a, b, coll)
  	end
 
  	if objects[obj.type].name == "flagge" then
+ 		love.audio.play(states.game.sounds["yippi"])
  		gamestate.pop()
+ 		gamestate.push(states.win)
+ 	else
+	 	love.audio.play(states.game.sounds["bip"])
  	end
 
- 	love.audio.play(states.game.sounds["bip"])
 end
  
 function endContact(a, b, coll)
