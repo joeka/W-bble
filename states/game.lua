@@ -16,6 +16,13 @@ local default_lvl = 1
 
 function game:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
+	self.particleImage = love.graphics.newImage('img/particle.png')
+	self.ps = love.graphics.newParticleSystem(self.particleImage, 400)
+	self.ps:setParticleLifetime(1, 4) -- Particles live at least 2s and at most 5s.
+	self.ps:setEmissionRate(20)
+	self.ps:setSizeVariation(1)
+	self.ps:setLinearAcceleration(-20, 20, 20, 30) -- Random movement in all directions.
+	self.ps:setColors(255, 255, 255, 255, 255, 255, 255, 0) -- Fade to transparency.
 	
 	if not world then
 		self:load_level(default_lvl)
@@ -79,13 +86,15 @@ function game:update(dt)
     	player:setSize(player:getSize() - 1)
     end
 
-
     vx, vy = player.physObj.body:getLinearVelocity()
 
     player.accel_x = (player.vx_l - vx) / dt
     player.accel_y = (player.vy_l - vy) / dt
     player.vx_l = vx
     player.vy_l = vy
+
+	self.ps:setLinearAcceleration(-vx, -vy, -vx + 10, -vy + 10)
+	self.ps:update(dt)
 
 	world:update(dt)
 	player:update(dt)
@@ -119,6 +128,14 @@ function game:draw()
 	for i,line in pairs(self.lines) do
 		love.graphics.line(line.points)
 	end
+
+	local ass_pos = vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
+
+	love.graphics.draw(
+		self.ps, 
+		player.physObj.body:getX() + ass_pos.x, 
+		player.physObj.body:getY() + ass_pos.y
+	)
 
 	self.cam:detach()
 end
