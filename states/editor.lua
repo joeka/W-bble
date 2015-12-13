@@ -80,7 +80,7 @@ end
 
 function editor:preview()
 	if not self.level_id then
-		table.insert(levels, {title = "preview", lines = self.lines})
+		table.insert(levels, {title = "preview", lines = self.lines, objects = self.objects})
 		self.level_id = #levels
 	else
 		levels[self.level_id] = {title = "preview", lines = self.lines, objects = self.objects}
