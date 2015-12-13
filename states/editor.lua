@@ -7,6 +7,8 @@ local min_dist = 5
 
 local objects = require ("objects")
 
+local keys_text = "LMB: draw line / move object    RMB: move screen     DEL: delete object     +: zoom in     -:zoom out"
+
 function editor:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
 
@@ -14,11 +16,11 @@ function editor:init()
 
 	objects:load_images()
 	local w, h = love.window.getDimensions()
-	local y = 30
+	local y = 40
 	for i, object in ipairs(objects) do
-		object.x = w - 110
+		object.x = w - 80
 		object.y = y
-		y = y + object.h
+		y = y + object.h + 20
 	end
 end
 
@@ -76,8 +78,8 @@ function editor:keypressed( key )
 	elseif key == "-" then
 		self.cam:zoom(1 / 1.2)
 	elseif key == "delete" then
-		local wx, wy = self.cam:mousePosition(x,y)
-		local _, i = self:object_clicked(wx, wy, false)
+		local x, y = love.mouse.getPosition()
+		local _, i = self:object_clicked(x, y, false)
 		if i then
 			table.remove(self.objects, i)
 		end 
@@ -202,10 +204,16 @@ function editor:draw()
 	-- GUI --
 	love.graphics.setColor( 255, 255, 255, 50 )
 	local w, h = love.window.getDimensions()
-	love.graphics.rectangle( "fill", w - 120,  20, 100, h - 40 )
+	love.graphics.rectangle( "fill", w - 100,  0, 100, h )
+	love.graphics.setColor( 255, 255, 255, 100 )
 	for i, object in ipairs(objects) do
 		love.graphics.draw(object.image, object.x, object.y )
 	end
+	love.graphics.setColor( 255, 255, 255, 50 )
+	love.graphics.rectangle( "fill", 0,  h - 20, w - 100, 20 )
+
+	love.graphics.setColor( 255, 255, 255 )
+	love.graphics.print(keys_text, 40, h - 16)
 end
 
 
