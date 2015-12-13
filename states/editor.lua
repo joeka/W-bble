@@ -12,8 +12,6 @@ function editor:init()
 end
 
 function editor:enter()
-	love.graphics.setBackgroundColor(0,0,0)
-	
 	editor.lines = {}
 	self.current_point = nil
 	self.current_line = {}

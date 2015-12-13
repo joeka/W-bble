@@ -12,6 +12,8 @@ function love.load()
 	states.game = require "states.game"
 	states.editor = require "states.editor"
 
+	love.graphics.setBackgroundColor(0,0,0)
+
 	love.keyboard.setTextInput( false )	--used later in editor_save state
 
 	levels:load()
