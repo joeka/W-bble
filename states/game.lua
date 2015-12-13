@@ -7,6 +7,8 @@ local debug = false
 local PLAYER_MAX_SIZE = 100
 local PLAYER_MIN_SIZE = 20
 
+local initial_position = { 500, 50}
+
 -- ###########################################################################################
 -- ###########################################################################################
 -- GAME
@@ -30,6 +32,17 @@ function game:init()
 	if not world then
 		self:load_level(default_lvl)
 	end
+
+	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
+	self.ps:setPosition(ass_pos.x, ass_pos.y) 
+end
+
+function game:reset()
+	player.physObj.body:setPosition(unpack(initial_position))
+	player.physObj.body:setAngle(0)
+	player.physObj.body:setLinearVelocity(0,0)
+	player.physObj.body:setAngularVelocity(0)
+	self.cam:lookAt(unpack(initial_position))
 end
 
 function game:load_level(lvl)
@@ -114,6 +127,9 @@ function game:update(dt)
 	world:update(dt)
 	player:update(dt)
 
+	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
+	self.ps:setPosition(ass_pos.x, ass_pos.y) 
+
 	local w = love.window.getWidth()
 	local h = love.window.getHeight()
 	self.cam:lockWindow(player.physObj.body:getX(), player.physObj.body:getY(), w*2/5, w*3/5, h*2/5, h*3/5 )
@@ -122,6 +138,8 @@ end
 function game:keypressed( key )
 	if key == "escape" then
 		gamestate.pop()
+	elseif key == "r" then
+		self:reset()
 	end
 end
 
@@ -148,12 +166,8 @@ function game:draw()
 		love.graphics.draw(objects[k.type].image, k.body:getX(), k.body:getY(), 0, 1, 1)
 	end
 
-	local ass_pos = vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
-
 	love.graphics.draw(
-		self.ps, 
-		player.physObj.body:getX() + ass_pos.x, 
-		player.physObj.body:getY() + ass_pos.y
+		self.ps, 0, 0
 	)
 
 	self.cam:detach()
