@@ -34,6 +34,13 @@ function game:load_level(lvl)
 	end
 
 	player:init()
+	self:init_camera()
+end
+
+function game:init_camera()
+	self.cam = camera()
+	self.cam.smoother = camera.smooth.damped(20)
+	self.cam:lookAt(player.physObj.body:getX(), player.physObj.body:getY())
 end
 
 function game:init_color()
@@ -77,6 +84,10 @@ function game:update(dt)
 
 	world:update(dt)
 	player:update(dt)
+
+	local w = love.window.getWidth()
+	local h = love.window.getHeight()
+	self.cam:lockWindow(player.physObj.body:getX(), player.physObj.body:getY(), w*2/5, w*3/5, h*2/5, h*3/5 )
 end
 
 function game:keypressed( key )
@@ -86,13 +97,16 @@ function game:keypressed( key )
 end
 
 function game:draw()
+	self.cam:attach()
+
 	local bg_scale_x = love.graphics.getWidth() / self.backgroundImage:getWidth()
 	local bg_scale_y = love.graphics.getHeight() / self.backgroundImage:getHeight()
 
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(self.backgroundImage, 0, 0, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
-	player:render()
 	
+	player:render()
+
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.setLineStyle( "smooth" )
 	love.graphics.setLineWidth( linewidth )
@@ -100,6 +114,8 @@ function game:draw()
 	for i,line in pairs(self.lines) do
 		love.graphics.line(line.points)
 	end
+
+	self.cam:detach()
 end
 
 -- ###########################################################################################
