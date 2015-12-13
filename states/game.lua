@@ -13,7 +13,6 @@ local default_lvl = 1
 
 function game:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
-	self.tex = love.graphics.newImage("img/tex.png")
 	
 	if not world then
 		self:load_level(default_lvl)
