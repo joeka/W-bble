@@ -3,6 +3,10 @@ local player = {}
 local world = {}
 local debug = false
 
+-- ###########################################################################################
+-- ###########################################################################################
+-- GAME
+
 
 function game:init()
 	font = love.graphics.newImageFont("img/font.png",
@@ -68,6 +72,14 @@ function game:update(dt)
     	player:setSize(player:getSize() - 1)
     end
 
+
+    vx, vy = player.physObj.body:getLinearVelocity()
+
+    player.accel_x = (player.vx_l - vx) / dt
+    player.accel_y = (player.vy_l - vy) / dt
+    player.vx_l = vx
+    player.vy_l = vy
+
 	world:update(dt)
 	player:update(dt)
 end
@@ -95,18 +107,30 @@ function game:draw()
 	end
 end
 
+-- ###########################################################################################
+-- ###########################################################################################
+-- PLAYER
+
 function player:init()
-	self.image = love.graphics.newImage('img/kreide_figur.png')
-	self.posX = 0
-	self.posY = 0
+	self.imgBody      = love.graphics.newImage('img/figur/body.png')
+	self.imgEyeLeft   = love.graphics.newImage('img/figur/eye_left.png')
+	self.imgEyeRight  = love.graphics.newImage('img/figur/eye_right.png')
+	self.imgFootLeft  = love.graphics.newImage('img/figur/fuss_left.png')
+	self.imgFootRight = love.graphics.newImage('img/figur/fuss_right.png')
 
 	self.physObj = {}
 	self.physObj.body = love.physics.newBody(world, 500, 50, "dynamic")
 	self.physObj.body:setMass(1)
+
 	self:setSize(30)
 
-	--self.image = love.graphics.newImage('img/sprite_test.png')
-	--local g = anim8.newGrid(150, 150, self.image:getWidth(), self.image:getHeight())
+	player.accel_x = 0
+	player.accel_y = 0
+	player.vx_l = 0
+	player.vy_l = 0
+
+	--self.imgBody = love.graphics.newImage('img/sprite_test.png')
+	--local g = anim8.newGrid(150, 150, self.imgBody:getWidth(), self.imgBody:getHeight())
 	--self.animation = anim8.newAnimation(g('1-6',1), 0.2)
 end
 
@@ -115,40 +139,92 @@ function player:update()
 end
 
 function player:getSize()
-	return self.physObj.shape:getRadius()
+	return self.physObj.shapeBody:getRadius()
 end
 
 function player:setSize(size)
-	if self.physObj.fixture ~= nil then
-		self.physObj.fixture:destroy()
+	if self.physObj.fixtureBody ~= nil then
+		self.physObj.fixtureBody:destroy()
 	end
 
-	self.physObj.shape = love.physics.newCircleShape(size)
-	self.physObj.fixture = love.physics.newFixture(self.physObj.body, self.physObj.shape)
-	self.physObj.fixture:setRestitution(0.1)
-	self.physObj.fixture:setFriction(1)
-	self.physObj.fixture:setUserData("Ball")
+	self.physObj.shapeBody = love.physics.newCircleShape(size)
+	self.physObj.fixtureBody = love.physics.newFixture(self.physObj.body, self.physObj.shapeBody)
+	self.physObj.fixtureBody:setRestitution(0.1)
+	self.physObj.fixtureBody:setFriction(1)
+	self.physObj.fixtureBody:setUserData("body")
 end
 
 function player:render()
-	local figure_scale_x = 2 * self.physObj.shape:getRadius() / self.image:getWidth()
-	local figure_scale_y = 2 * self.physObj.shape:getRadius() / self.image:getHeight()
+	local EYE_ROTATE_FACTOR = 10
+	local EYE_SCALE_X_FACTOR = 20
+	local EYE_SCALE_Y_FACTOR = 40
+	local FOOT_ROTATE_FACTOR = 40
+
+	local body_scale_x = 2 * self.physObj.shapeBody:getRadius() / self.imgBody:getWidth()
+	local body_scale_y = 2 * self.physObj.shapeBody:getRadius() / self.imgBody:getHeight()
 
 	love.graphics.setColor(255, 255, 255)
 
-	local translate = vector(-1,-1):rotateInplace(self.physObj.body:getAngle()) * self.physObj.shape:getRadius()
-	love.graphics.draw(self.image,
-					   self.physObj.body:getX() + translate.x,
-					   self.physObj.body:getY() + translate.y,
-					   self.physObj.body:getAngle(),
-					   figure_scale_x,
-					   figure_scale_y)
+	x, y = self.physObj.body:getLinearVelocity()
+	r = self.physObj.body:getAngularVelocity()
+
+	eye_scale_x = body_scale_x * (1 - math.abs(r) / EYE_SCALE_X_FACTOR)
+	eye_scale_y = body_scale_y * (1 + math.abs(r) / EYE_SCALE_Y_FACTOR)
+
+	love.graphics.draw(self.imgBody, 
+					   self.physObj.body:getX(), 
+					   self.physObj.body:getY(),
+					   self.physObj.body:getAngle(), 
+					   body_scale_x, body_scale_y,
+					   self.imgBody:getWidth() / 2,
+					   self.imgBody:getHeight() / 2)
+
+	love.graphics.draw(self.imgEyeLeft,
+					   self.physObj.body:getX(),
+					   self.physObj.body:getY(),
+					   self.physObj.body:getAngle() - r / EYE_ROTATE_FACTOR,
+					   eye_scale_x, eye_scale_y,
+					   self.imgBody:getWidth() / 2 + self.imgEyeLeft:getWidth() * 0.3,
+					   self.imgBody:getHeight() / 2  + self.imgEyeLeft:getHeight())
+
+	love.graphics.draw(self.imgEyeRight,
+					   self.physObj.body:getX(),
+					   self.physObj.body:getY(),
+					   self.physObj.body:getAngle() - r / EYE_ROTATE_FACTOR,
+					   eye_scale_x, eye_scale_y,
+					   self.imgBody:getWidth() / 2 - self.imgEyeLeft:getWidth() * 1.6,
+					   self.imgBody:getHeight() / 2  + self.imgEyeLeft:getHeight() * 0.9)
+
+	love.graphics.draw(self.imgFootLeft,
+					   self.physObj.body:getX(),
+					   self.physObj.body:getY(),
+					   self.physObj.body:getAngle() + r / FOOT_ROTATE_FACTOR,
+					   body_scale_x, body_scale_y,
+					   self.imgBody:getWidth() / 2 + self.imgEyeLeft:getWidth() * 0.3,
+					   self.imgBody:getHeight() / 2  - self.imgEyeLeft:getHeight() * 2.4)
+
+	love.graphics.draw(self.imgFootRight,
+					   self.physObj.body:getX(),
+					   self.physObj.body:getY(),
+					   self.physObj.body:getAngle() + r / FOOT_ROTATE_FACTOR,
+					   body_scale_x, body_scale_y,
+					   self.imgBody:getWidth() / 2 - self.imgEyeLeft:getWidth() * 1.7,
+					   self.imgBody:getHeight() / 2  - self.imgEyeLeft:getHeight() * 2.4)
 
 	if (debug) then
-		love.graphics.circle("line", self.physObj.body:getX(), self.physObj.body:getY(), self.physObj.shape:getRadius())
-	end
+		love.graphics.print("a_x: "..self.accel_x, 10, 10)
+		love.graphics.print("a_y: "..self.accel_y, 10, 25)
+		love.graphics.print("mass: "..self.physObj.body:getMass(), 10, 40)
+		love.graphics.print("theta: "..r, 10, 55)
 
-	--animation:draw(self.image, self.physObj.body:getX() - 150 / 2, self.physObj.body:getY()  - (150 - self.physObj.shape:getRadius()), 0, 1, 1, 0, 0)
+		love.graphics.circle("line", self.physObj.body:getX(), self.physObj.body:getY(), self.physObj.shapeBody:getRadius())
+	end
 end
 
+
+--
+-- ###########################################################################################
+-- ###########################################################################################
+
 return game
+
