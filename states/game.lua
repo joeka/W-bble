@@ -3,6 +3,9 @@ local player = {}
 local world = nil
 local debug = false
 
+local PLAYER_MAX_SIZE = 60
+local PLAYER_MIN_SIZE = 20
+
 -- ###########################################################################################
 -- ###########################################################################################
 -- GAME
@@ -56,17 +59,19 @@ function game:resume()
 end
 
 function game:update(dt)
-    if love.keyboard.isDown("right") then
-        player.physObj.body:applyForce(10000, 0)
-    elseif love.keyboard.isDown("left") then
-        player.physObj.body:applyForce(-10000, 0) 
-    end
+	if debug then
+	    if love.keyboard.isDown("right") then
+	        player.physObj.body:applyForce(10000, 0)
+	    elseif love.keyboard.isDown("left") then
+	        player.physObj.body:applyForce(-10000, 0) 
+	    end
 
-    if love.keyboard.isDown("up") then
-        player.physObj.body:applyForce(0, -10000)
-    elseif love.keyboard.isDown("down") then
-        player.physObj.body:applyForce(0, 10000)
-    end
+	    if love.keyboard.isDown("up") then
+	        player.physObj.body:applyForce(0, -10000)
+	    elseif love.keyboard.isDown("down") then
+	        player.physObj.body:applyForce(0, 10000)
+	    end
+	end
 
     if love.keyboard.isDown("+") then
     	player:setSize(player:getSize() + 1)
@@ -156,6 +161,12 @@ end
 function player:setSize(size)
 	if self.physObj.fixtureBody ~= nil then
 		self.physObj.fixtureBody:destroy()
+	end
+
+	if (size < PLAYER_MIN_SIZE) then
+		size = PLAYER_MIN_SIZE
+	elseif (size > PLAYER_MAX_SIZE) then
+		size = PLAYER_MAX_SIZE
 	end
 
 	self.physObj.shapeBody = love.physics.newCircleShape(size)
