@@ -24,6 +24,10 @@ function love.load()
 								      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
 								      "123456789.,!?-+/():;%&`'*#=[]\"")
 
+	music = love.audio.newSource( 'snd/music.wav', 'static' )
+	music:setLooping( true ) --so it doesnt stop
+	music:play()
+
 	love.graphics.setFont(font)
 
 	gamestate.registerEvents()

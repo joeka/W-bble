@@ -27,6 +27,9 @@ function game:init()
 	self.ps:setLinearAcceleration(-20, 20, 20, 30) -- Random movement in all directions.
 	self.ps:setColors(255, 255, 255, 255, 255, 255, 255, 0) -- Fade to transparency.
 	
+	self.sounds = {  }
+	self.sounds["bip"] = love.audio.newSource("snd/bip.wav", "static")
+
 	objects:load_images()
 
 	if not world then
@@ -194,6 +197,8 @@ function beginContact(a, b, coll)
  	if objects[obj.type].name == "flagge" then
  		gamestate.pop()
  	end
+
+ 	love.audio.play(states.game.sounds["bip"])
 end
  
 function endContact(a, b, coll)

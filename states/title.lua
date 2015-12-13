@@ -1,5 +1,11 @@
 local title = {}
 
+function title:init()
+	-- music = love.audio.newSource( 'snd/music.wav', 'static' )
+	-- music:setLooping( true ) --so it doesnt stop
+	-- music:play()
+end
+
 function title:enter()
 	love.graphics.setColor(255,255,255)
 	love.graphics.setBackgroundColor(0, 0, 0)
