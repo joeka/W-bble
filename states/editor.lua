@@ -84,8 +84,12 @@ end
 function editor:mousereleased(x, y, button)
 	if button == "l" then
 		local wx, wy = self.cam:worldCoords(x,y)
-		table.insert(self.current_line, wx)
-		table.insert(self.current_line, wy)
+
+		if self.current_point:dist(vector(wx,wy)) > min_dist then
+			table.insert(self.current_line, wx)
+			table.insert(self.current_line, wy)
+		end
+		
 		self.current_point = nil
 		self.drawing = false
 		if #self.current_line >= 4 then
