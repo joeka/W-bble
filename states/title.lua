@@ -17,6 +17,8 @@ end
 function title:keypressed( key )
 	if key == "escape" then
 		love.event.push('quit')
+	elseif key == "e" then
+		gamestate.push (states.editor)
 	elseif key == "return" then
 		gamestate.push (states.game)
 	end

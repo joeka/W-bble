@@ -1,39 +1,36 @@
 local game = {}
 local player = {}
-local world = {}
+local world = nil
 local debug = false
 
+local linewidth = 20
+
+local default_lvl = 1
 
 function game:init()
-	font = love.graphics.newImageFont("img/font.png",
-								      " abcdefghijklmnopqrstuvwxyz" ..
-								      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
-								      "123456789.,!?-+/():;%&`'*#=[]\"")
-
-	love.graphics.setFont(font)
-
-	self.backgroundImage = love.graphics.newImage("img/background.png", format)
-	world = love.physics.newWorld(0, 200, true)
-	player:init()
-	self:load_level(1)
+	self.backgroundImage = love.graphics.newImage("img/background.png")
+	self.tex = love.graphics.newImage("img/tex.png")
+	
+	if not world then
+		self:load_level(default_lvl)
+	end
 end
 
 function game:load_level(lvl)
-	self.static = {}
-	self.static.b = love.physics.newBody(world, 400, 400, "static")
-	self.static.s = love.physics.newRectangleShape(200, 50)
-	self.static.f = love.physics.newFixture(self.static.b, self.static.s)
-	self.static.f:setUserData("Block")
+	world = love.physics.newWorld(0, 200, true)
 
 	self.lines = {}
 	for i, polygon in pairs(levels[lvl].lines) do
 		local line = {}
 		line.points = polygon
-		line.shape = love.physics.newChainShape(true, polygon)
+		line.shape = love.physics.newChainShape(false, polygon)
 		line.body = love.physics.newBody(world, 0, 0, "static")
 		line.fixture = love.physics.newFixture(line.body, line.shape, 1)
+		
 		table.insert(self.lines, line)
 	end
+
+	player:init()
 end
 
 function game:init_color()
@@ -74,7 +71,7 @@ end
 
 function game:keypressed( key )
 	if key == "escape" then
-		gamestate.pop(states.title)
+		gamestate.pop()
 	end
 end
 
@@ -85,13 +82,14 @@ function game:draw()
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(self.backgroundImage, 0, 0, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
 	player:render()
+	
+	love.graphics.setColor(255, 255, 255)
+	love.graphics.setLineStyle( "smooth" )
+	love.graphics.setLineWidth( linewidth )
 
-	love.graphics.setColor(0, 0, 0)
-	love.graphics.polygon("line", self.static.b:getWorldPoints(self.static.s:getPoints()))
-
-	--debug stuff
 	for i,line in pairs(self.lines) do
-		love.graphics.polygon("line", line.points)
+		print(#line)
+		love.graphics.line(line.points)
 	end
 end
 
