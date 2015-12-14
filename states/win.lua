@@ -96,7 +96,7 @@ function win_input:keypressed( key )
 		states.win.name = nil
 		gamestate.pop()
 	elseif key == "return" then
-		states.win.name = self.win
+		states.win.name = self.name
 		highscores:add(states.win.level, states.win.time, self.name)
 		gamestate.pop()
 	elseif key == "backspace" then
