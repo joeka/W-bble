@@ -43,7 +43,7 @@ function editor:reset()
 	self.cam = camera()
 
 	self.level_id = nil
-	self.title = nil
+	self.title = ""
 end
 
 function editor:load( level )
@@ -120,10 +120,10 @@ function editor:keypressed( key )
 end
 
 function editor:preview()
-	if self.title then
+	if self.title ~= "" then
 		title = self.title
 	else
-		title = preview
+		title = "preview"
 	end
 
 	if not self.level_id then
