@@ -30,9 +30,8 @@ function love.load()
 	local grain = shine.filmgrain()
     grain.opacity = 0.1
     local vignette = shine.vignette()
-    vignette.parameters = {radius = 0.7, opacity = 0.5}
-    local desaturate = shine.desaturate{strength = 0.3, tint = {200,250,200}}
-    post_effect = desaturate:chain(grain):chain(vignette)
+    vignette.parameters = {radius = 1, opacity = 0.8}
+    post_effect = grain:chain(vignette)
     post_effect.opacity = 0.5
 
 	love.graphics.setFont(font)
