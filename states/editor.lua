@@ -316,15 +316,15 @@ function editor_save:init()
 	self.box = { w=400, h=200 }
 	self.box.x = w/2 - self.box.w/2
 	self.box.y = h/2 - self.box.h/2
+end
 
+function editor_save:enter()
 	if editor.title and editor.title ~= "preview" then
 		self.title = editor.title
 	else
 		self.title = ""
 	end
-end
-
-function editor_save:enter()
+	
 	love.textinput = self.textinput
 	love.keyboard.setTextInput( true )
 end
