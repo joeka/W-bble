@@ -25,8 +25,14 @@ function editor:init()
 end
 
 function editor:enter()
-	editor.lines = {}
-	editor.objects = {}
+	if not self.level_id then
+		self:reset()
+	end
+end
+
+function editor:reset()
+	self.lines = {}
+	self.objects = {}
 	self.current_point = nil
 	self.current_line = {}
 	self.drawing = false
@@ -37,6 +43,17 @@ function editor:enter()
 	self.cam = camera()
 
 	self.level_id = nil
+	self.title = nil
+end
+
+function editor:load( level )
+	self:reset()
+	self.level_id = level
+
+	self.lines = levels[level].lines
+	self.objects = levels[level].objects
+
+	self.title = levels[level].title
 end
 
 function editor:resume()
@@ -74,6 +91,7 @@ end
 function editor:keypressed( key )
 	if key == "escape" then
 		gamestate.pop()
+		self:reset()
 	elseif key == "return" then
 		self:preview()
 	elseif key == "s" then
@@ -100,11 +118,17 @@ function editor:keypressed( key )
 end
 
 function editor:preview()
+	if self.title then
+		title = self.title
+	else
+		title = preview
+	end
+
 	if not self.level_id then
-		table.insert(levels, {title = "preview", lines = self.lines, objects = self.objects})
+		table.insert(levels, {title = title, lines = self.lines, objects = self.objects})
 		self.level_id = #levels
 	else
-		levels[self.level_id] = {title = "preview", lines = self.lines, objects = self.objects}
+		levels[self.level_id] = {title = title, lines = self.lines, objects = self.objects}
 	end
 	states.game:load_level(self.level_id)
 	gamestate.push(states.game)
@@ -288,7 +312,11 @@ function editor_save:init()
 	self.box.x = w/2 - self.box.w/2
 	self.box.y = h/2 - self.box.h/2
 
-	self.title = ""
+	if editor.title then
+		self.title = editor.title
+	else
+		self.title = ""
+	end
 end
 
 function editor_save:enter()

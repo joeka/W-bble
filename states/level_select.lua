@@ -51,6 +51,9 @@ function level_select:keypressed( key )
 		gamestate.push (states.game)
 	elseif key == "escape" then
 		gamestate.pop()
+	elseif key == "e" then
+		states.editor:load(self.sel_key)
+		gamestate.push(states.editor)
 	end
 end
 
