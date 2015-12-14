@@ -35,9 +35,7 @@ function level_select:update(dt)
 end
 
 function level_select:keypressed( key )
-	if key == "down" then
-		self.list:keypressed(key)
-	elseif key == "up" then
+	if key == "down" or key == "up" then
 		self.list:keypressed(key)
 	elseif key == "return" then
 		states.game:load_level(self.list:getSelectedItemTag())
