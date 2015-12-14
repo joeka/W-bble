@@ -314,7 +314,7 @@ function editor_save:init()
 	self.box.x = w/2 - self.box.w/2
 	self.box.y = h/2 - self.box.h/2
 
-	if editor.title then
+	if editor.title and editor.title ~= "preview" then
 		self.title = editor.title
 	else
 		self.title = ""
