@@ -4,6 +4,7 @@ local music = require("background_music")
 title.text = "press any key"
 
 function title:init()
+	self.imgTitle = love.graphics.newImage("img/title.png")
 	figur:init()
 	music:init()
 	music:play()
@@ -22,6 +23,7 @@ end
 
 function title:draw()
 	love.graphics.print(self.text, 100, 100)
+	love.graphics.draw(self.imgTitle, 50, 200, 0, 0.3, 0.3)
 	figur:draw()
 end
 
@@ -36,10 +38,11 @@ function title:keypressed( key )
 		love.event.push('quit')
 	elseif key == "e" then
 		gamestate.push (states.editor)
-	elseif key == "l" then
-		gamestate.push (states.level_select)
+	-- elseif key == "l" then
+	-- 	gamestate.push (states.level_select)
 	elseif key == "return" then
-		gamestate.push (states.game)
+		--gamestate.push (states.game)
+		gamestate.push (states.level_select)
 	else
 		fail_counter = fail_counter + 1
 
