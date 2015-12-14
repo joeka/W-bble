@@ -31,6 +31,7 @@ end
 
 function win:update_highscore()
 	local highscore_list = highscores:get(self.level)
+	self.highscores_text = ""
 	for i, entry in ipairs(highscore_list) do
 		self.highscores_text = self.highscores_text .. i .. ":		" .. entry.name .. " (" .. entry.time .. ")\n" 
 	end
