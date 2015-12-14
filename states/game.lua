@@ -22,12 +22,12 @@ function game:init()
 	music:init()
 
 	self.backgroundImage = love.graphics.newImage("img/background.png")
-	self.particleImage = love.graphics.newImage('img/particle.png')
+	self.particleImage = love.graphics.newImage('img/particle2.png')
 	self.ps = love.graphics.newParticleSystem(self.particleImage, 400)
-	self.ps:setParticleLifetime(1, 4) -- Particles live at least 2s and at most 5s.
-	self.ps:setEmissionRate(20)
-	self.ps:setSizeVariation(1)
-	self.ps:setLinearAcceleration(-20, 20, 20, 30) -- Random movement in all directions.
+	self.ps:setParticleLifetime(.5, 2) -- Particles live at least 2s and at most 5s.
+	self.ps:setSizes(0.1, 0.2, 0.3, 0.4, 0.5)
+	self.ps:setSpread(0.8)
+	self.ps:setLinearAcceleration(0, 9, 0, 12)
 	self.ps:setColors(255, 255, 255, 255, 255, 255, 255, 0) -- Fade to transparency.
 	
 	self.sounds = {  }
@@ -39,9 +39,6 @@ function game:init()
 	if not world then
 		self:load_level(default_lvl)
 	end
-
-	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
-	self.ps:setPosition(ass_pos.x, ass_pos.y)
 
 	self.timer = 0
 end
@@ -134,22 +131,11 @@ function game:update(dt)
     	player:setSize(player:getSize() - 1)
     end
 
-    vx, vy = player.physObj.body:getLinearVelocity()
-
-    player.accel_x = (player.vx_l - vx) / dt
-    player.accel_y = (player.vy_l - vy) / dt
-    player.vx_l = vx
-    player.vy_l = vy
-
-	self.ps:setLinearAcceleration(-vx, -vy, -vx + 10, -vy + 10)
 	self.ps:update(dt)
 
 	world:update(dt)
 	player:update(dt)
 	music:update()
-
-	local ass_pos = vector(player.physObj.body:getX(), player.physObj.body:getY()) + vector(0, 1):rotated(player.physObj.body:getAngle()) * player.physObj.shapeBody:getRadius()
-	self.ps:setPosition(ass_pos.x, ass_pos.y) 
 
 	local w = love.window.getWidth()
 	local h = love.window.getHeight()
@@ -241,6 +227,16 @@ function beginContact(a, b, coll)
  	if obj == nil then
  		obj = objectForFixture(b)
  		if obj == nil then
+			local v = vector(player.physObj.body:getLinearVelocity())
+			local speed = v:len()
+
+			game.ps:setSpeed(speed * 0.2, speed * 0.4)
+
+ 			local x,y = coll:getPositions()
+ 			--local vx, vy = coll:getNormal()
+ 			--game.ps:setDirection() --radians
+ 			game.ps:setPosition(x, y)
+ 			game.ps:emit(10)
  			return
  		end
  	end
