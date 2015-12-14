@@ -1,6 +1,5 @@
 gamestate = require "libs.hump.gamestate"
 vector = require "libs.hump.vector"
-anim8 = require "libs.anim8"
 camera = require "libs.hump.camera"
 levels = require "levels.levels"
 

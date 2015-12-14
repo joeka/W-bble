@@ -7,7 +7,7 @@ local min_dist = 5
 
 local objects = require ("objects")
 
-local keys_text = "LMB: draw line / move object    RMB: move screen     DEL: delete object     +: zoom in     -:zoom out"
+local keys_text = "LMB: draw line / move object   RMB: move screen   DEL: delete object   +: zoom in   -:zoom out   n: new level"
 
 function editor:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
@@ -25,8 +25,14 @@ function editor:init()
 end
 
 function editor:enter()
-	editor.lines = {}
-	editor.objects = {}
+	if not self.level_id then
+		self:reset()
+	end
+end
+
+function editor:reset()
+	self.lines = {}
+	self.objects = {}
 	self.current_point = nil
 	self.current_line = {}
 	self.drawing = false
@@ -37,6 +43,17 @@ function editor:enter()
 	self.cam = camera()
 
 	self.level_id = nil
+	self.title = nil
+end
+
+function editor:load( level )
+	self:reset()
+	self.level_id = level
+
+	self.lines = levels[level].lines
+	self.objects = levels[level].objects
+
+	self.title = levels[level].title
 end
 
 function editor:resume()
@@ -74,6 +91,7 @@ end
 function editor:keypressed( key )
 	if key == "escape" then
 		gamestate.pop()
+		self:reset()
 	elseif key == "return" then
 		self:preview()
 	elseif key == "s" then
@@ -95,18 +113,26 @@ function editor:keypressed( key )
 		local _, i = self:object_clicked(x, y, false)
 		if i then
 			table.remove(self.objects, i)
-		end 
+		end
+	elseif key == "r" or key == "n" then
+		self:reset()
 	end
 end
 
 function editor:preview()
+	if self.title then
+		title = self.title
+	else
+		title = preview
+	end
+
 	if not self.level_id then
-		table.insert(levels, {title = "preview", lines = self.lines, objects = self.objects})
+		table.insert(levels, {title = title, lines = self.lines, objects = self.objects})
 		self.level_id = #levels
 	else
-		levels[self.level_id] = {title = "preview", lines = self.lines, objects = self.objects}
+		levels[self.level_id] = {title = title, lines = self.lines, objects = self.objects}
 	end
-	states.game:load_level(self.level_id)
+	states.game:load_level(self.level_id, true)
 	gamestate.push(states.game)
 end
 
@@ -173,18 +199,16 @@ function editor:mousepressed(x, y, button)
 		if obj then
 			self.current_point = vector(wx,wy)
 			self:move_object(obj)
+		elseif line then
+			self.line_highlight = line
+			self.line_move_current_pt = vector(self.cam:worldCoords(x,y))
+			self.moving_line = true
 		else
-			if line ~= nil then
-				self.line_highlight = line
-				self.line_move_current_pt = vector(x,y)
-				self.moving_line = true
-			else
-				self.line_highlight = nil
-				table.insert(self.current_line, wx)
-				table.insert(self.current_line, wy)
-				self.current_point = vector(wx, wy)
-				self.drawing = true
-			end
+			self.line_highlight = nil
+			table.insert(self.current_line, wx)
+			table.insert(self.current_line, wy)
+			self.current_point = vector(wx, wy)
+			self.drawing = true
 		end
 	elseif button == "r" then
 		self.current_pos = vector(x,y)
@@ -239,10 +263,6 @@ function editor:draw()
 	love.graphics.setLineStyle( "smooth" )
 	love.graphics.setLineWidth( 10 )
 
-	if (self.line_highlight ~= nil) then
-		love.graphics.print("Line highlight", 10, 10)
-	end
-
 	for i,line in pairs(self.lines) do
 		if (self.line_highlight ~= nil and self.line_highlight == i) then
 			love.graphics.setColor(255, 0, 255)
@@ -277,7 +297,11 @@ function editor:draw()
 	love.graphics.rectangle( "fill", 0,  h - 20, w - 100, 20 )
 
 	love.graphics.setColor( 255, 255, 255 )
-	love.graphics.print(keys_text, 40, h - 16)
+	love.graphics.print(keys_text, 20, h - 16)
+
+	if (self.line_highlight ~= nil) then
+		love.graphics.print("Line highlight", 10, 10)
+	end
 end
 
 
@@ -290,7 +314,11 @@ function editor_save:init()
 	self.box.x = w/2 - self.box.w/2
 	self.box.y = h/2 - self.box.h/2
 
-	self.title = ""
+	if editor.title then
+		self.title = editor.title
+	else
+		self.title = ""
+	end
 end
 
 function editor_save:enter()

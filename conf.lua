@@ -1,10 +1,10 @@
 function love.conf(t)
-	t.title = "LD34 Game"
-	t.author = "Arne Elster, Jonathan Wehrle"
+	t.title = "Wöbble"
+	t.author = "lauterklabauter, Jonathan Wehrle"
 
 	t.version = "0.9.2"
 
-	t.window.title = "LD34 Game"
+	t.window.title = "Wöbble"
     t.window.icon = nil
 
 	t.window.width = 1280

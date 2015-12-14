@@ -56,7 +56,9 @@ function game:reset()
 	self.timer = 0
 end
 
-function game:load_level(lvl)
+function game:load_level(lvl, preview)
+	self.preview = preview
+
 	self.current_level = lvl
 	world = love.physics.newWorld(0, 200, true)
 	world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -242,7 +244,9 @@ function beginContact(a, b, coll)
  	if objects[obj.type].name == "flagge" then
  		love.audio.play(states.game.sounds["yippi"])
  		gamestate.pop()
- 		gamestate.push(states.win)
+ 		if not game.preview then
+ 			gamestate.push(states.win)
+ 		end
  	else
 	 	love.audio.play(states.game.sounds["bip"])
  	end
