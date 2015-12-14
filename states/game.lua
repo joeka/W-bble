@@ -101,6 +101,7 @@ function game:init_color()
 end
 
 function game:enter()
+	self:reset()
 	self.init_color()
 end
 
