@@ -120,10 +120,10 @@ function editor:keypressed( key )
 end
 
 function editor:preview()
-	if self.title then
+	if self.title ~= "" then
 		title = self.title
 	else
-		title = preview
+		title = "preview"
 	end
 
 	if not self.level_id then
