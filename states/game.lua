@@ -50,6 +50,8 @@ function game:reset()
 	player.physObj.body:setAngularVelocity(0)
 	self.cam:lookAt(unpack(initial_position))
 
+	player:setSize(30)
+
 	self.timer = 0
 end
 
