@@ -39,6 +39,7 @@ function win:update_highscore()
 end
 
 function win:resume()
+	states.win:update_highscore()
 	love.graphics.setBackgroundColor(0, 0, 0)
 	love.graphics.setColor(255, 255, 255)
 end
@@ -97,7 +98,6 @@ function win_input:keypressed( key )
 	elseif key == "return" then
 		states.win.name = self.win
 		highscores:add(states.win.level, states.win.time, self.name)
-		states.win:update_highscore()
 		gamestate.pop()
 	elseif key == "backspace" then
 		local byteoffset = utf8.offset(self.name, -1)
