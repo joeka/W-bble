@@ -115,7 +115,7 @@ function editor:keypressed( key )
 		if i then
 			table.remove(self.objects, i)
 		end
-	elseif key == "r" or key == "n" then
+	elseif key == "n" then
 		self:reset()
 	end
 end
