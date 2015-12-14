@@ -5,7 +5,7 @@ function love.conf(t)
 	t.version = "0.9.2"
 
 	t.window.title = "Wöbble"
-    t.window.icon = nil
+    t.window.icon = "img/wöbble-256.png"
 
 	t.window.width = 1280
 	t.window.height = 720
