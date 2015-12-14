@@ -132,7 +132,7 @@ function editor:preview()
 	else
 		levels[self.level_id] = {title = title, lines = self.lines, objects = self.objects}
 	end
-	states.game:load_level(self.level_id)
+	states.game:load_level(self.level_id, true)
 	gamestate.push(states.game)
 end
 
