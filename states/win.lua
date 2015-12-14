@@ -20,6 +20,7 @@ function win:enter()
 	music:stop()
 	music:play()
 
+	self.highscores_text = ""
 	self.level = levels[states.game.current_level].title
 	self.time = states.game.timer
 	if highscores:good_enough(level, time) then
@@ -47,7 +48,13 @@ function win:update(dt)
 end
 
 function win:keypressed( key )
-	if (key == "return") or key == "escape" then
+	if (key == "return") then
+		gamestate.pop()
+		if states.game.current_level < #levels then
+			gamestate.push(states.game)
+			states.game:load_level(states.game.current_level + 1)
+		end
+	elseif key == "escape" then
 		gamestate.pop()
 	end
 end
