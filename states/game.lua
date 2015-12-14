@@ -165,6 +165,8 @@ function game:keypressed( key )
 end
 
 function game:draw()
+
+	post_effect:draw(function()
 	self.cam:attach()
 
 	local bg_scale_x = love.graphics.getWidth() / self.backgroundImage:getWidth()
@@ -219,6 +221,8 @@ function game:draw()
 	)
 
 	self.cam:detach()
+	end)
+
 	local w, h = love.window.getDimensions()
 	love.graphics.print(self.timer, w - 190, 20 )
 end

@@ -3,7 +3,11 @@ vector = require "libs.hump.vector"
 camera = require "libs.hump.camera"
 levels = require "levels.levels"
 
+shine = require "libs.shine"
+
 states = {}
+
+post_effect = nil
 
 function love.load()
 	states.title = require "states.title"
@@ -22,6 +26,14 @@ function love.load()
 								      " abcdefghijklmnopqrstuvwxyz" ..
 								      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
 								      "123456789.,!?-+/():;%&`'*#=[]\"")
+
+	local grain = shine.filmgrain()
+    grain.opacity = 0.1
+    local vignette = shine.vignette()
+    vignette.parameters = {radius = 0.7, opacity = 0.5}
+    local desaturate = shine.desaturate{strength = 0.3, tint = {200,250,200}}
+    post_effect = desaturate:chain(grain):chain(vignette)
+    post_effect.opacity = 0.5
 
 	love.graphics.setFont(font)
 
