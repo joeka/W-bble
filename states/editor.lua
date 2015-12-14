@@ -54,6 +54,15 @@ function editor:update(dt)
 			table.insert(self.current_line, wy)
 			self.current_point = vector(wx,wy)
 		end
+	elseif self.moving_line then
+		local wx, wy = self.cam:mousePosition()
+		local dx, dy = wx - self.line_move_current_pt.x, wy - self.line_move_current_pt.y
+		local line = self.lines[self.line_highlight]
+		for i, pt in ipairs(line) do
+			if i % 2 == 0 then line[i] = pt + dy end
+			if i % 2 == 1 then line[i] = pt + dx end
+		end
+		self.line_move_current_pt = vector(wx,wy)
 	elseif self.moving_object then
 		local wx, wy = self.cam:mousePosition()
 		self.moving_object.x = self.moving_object.x + (wx - self.current_point.x)
@@ -78,6 +87,10 @@ function editor:keypressed( key )
 	elseif key == "-" then
 		self.cam:zoom(1 / 1.2)
 	elseif key == "delete" then
+		if self.line_highlight ~= nil then
+			table.remove(self.lines, self.line_highlight)
+		end
+
 		local x, y = love.mouse.getPosition()
 		local _, i = self:object_clicked(x, y, false)
 		if i then
@@ -99,6 +112,30 @@ end
 
 function editor:move_object(obj)
 	self.moving_object = obj
+end
+
+function editor:line_clicked(x, y)
+	p = vector(x, y)
+	for i, line in pairs(self.lines) do
+		p1x = 0
+		p1y = 0
+		for j, pt in ipairs(line) do
+			if (j % 2) == 0 then p1y = pt end
+			if (j % 2) == 1 then p1x = pt end
+
+			if (j % 2) == 1 then
+				dist = PointDistance(p, vector(p1x, p1y))
+				if dist < 60 then
+					return i
+				end
+			end
+		end
+	end
+	return nil
+end
+
+function PointDistance(A, B)
+	return math.sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y))
 end
 
 function editor:object_clicked(x, y, create)
@@ -131,14 +168,23 @@ function editor:mousepressed(x, y, button)
 	if button == "l" then
 		local wx, wy = self.cam:worldCoords(x,y)
 		local obj = self:object_clicked(x, y)
+		local line = self:line_clicked(wx, wy)
+
 		if obj then
 			self.current_point = vector(wx,wy)
 			self:move_object(obj)
 		else
-			table.insert(self.current_line, wx)
-			table.insert(self.current_line, wy)
-			self.current_point = vector(wx, wy)
-			self.drawing = true
+			if line ~= nil then
+				self.line_highlight = line
+				self.line_move_current_pt = vector(x,y)
+				self.moving_line = true
+			else
+				self.line_highlight = nil
+				table.insert(self.current_line, wx)
+				table.insert(self.current_line, wy)
+				self.current_point = vector(wx, wy)
+				self.drawing = true
+			end
 		end
 	elseif button == "r" then
 		self.current_pos = vector(x,y)
@@ -150,13 +196,17 @@ function editor:mousereleased(x, y, button)
 	if button == "l" then
 		local wx, wy = self.cam:worldCoords(x,y)
 
-		if self.moving_object then
+		if self.moving_line then
+			self.moving_line = false
+			self.line_move_current_pt = nil
+
+		elseif self.moving_object then
 			self.moving_object.x = self.moving_object.x + (wx - self.current_point.x)
 			self.moving_object.y = self.moving_object.y + (wy - self.current_point.y)
 			self.moving_object = nil
 			current_point = nil
-		elseif self.drawing then
 
+		elseif self.drawing then
 			if self.current_point:dist(vector(wx,wy)) > min_dist then
 				table.insert(self.current_line, wx)
 				table.insert(self.current_line, wy)
@@ -169,6 +219,7 @@ function editor:mousereleased(x, y, button)
 			end
 			self.current_line = {}
 		end
+
 	elseif button == "r" then
 		self.moving = false
 		self.cam:move(self.current_pos.x - x, self.current_pos.y - y)
@@ -178,17 +229,33 @@ end
 function editor:draw()
 	self.cam:attach()
 
+	local bg_scale_x = love.graphics.getWidth() / self.backgroundImage:getWidth()
+	local bg_scale_y = love.graphics.getHeight() / self.backgroundImage:getHeight()
+
+	love.graphics.setColor(255, 255, 255)
+	love.graphics.draw(self.backgroundImage, 0, 0, 0, bg_scale_x, bg_scale_y, 0, 0, 0)
+
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.setLineStyle( "smooth" )
 	love.graphics.setLineWidth( 10 )
 
+	if (self.line_highlight ~= nil) then
+		love.graphics.print("Line highlight", 10, 10)
+	end
+
 	for i,line in pairs(self.lines) do
+		if (self.line_highlight ~= nil and self.line_highlight == i) then
+			love.graphics.setColor(255, 0, 255)
+		else
+			love.graphics.setColor(255, 255, 255)
+		end
 		love.graphics.line(line)
 	end
 	if #self.current_line >= 4 then
 		love.graphics.line(self.current_line)
 	end
 
+	love.graphics.setColor(255, 255, 255)
 	for i, object in ipairs(self.objects) do
 		love.graphics.draw(objects[object.type].image, object.x, object.y )
 	end

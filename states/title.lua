@@ -1,11 +1,11 @@
 local title = {}
 local figur = require("dancer")
+local music = require("background_music")
 title.text = "press any key"
 
 function title:init()
 	figur:init()
-	music = love.audio.newSource( 'snd/music.wav', 'static' )
-	music:setLooping( true ) --so it doesnt stop
+	music:init()
 	music:play()
 	figur:reset()
 end
@@ -21,12 +21,13 @@ function title:resume()
 end
 
 function title:draw()
-	love.graphics.print( self.text , 100, 100 )
+	love.graphics.print(self.text, 100, 100)
 	figur:draw()
 end
 
 function title:update(dt)
 	figur:update(dt)
+	music:update()
 end
 
 local fail_counter = 0

@@ -9,6 +9,7 @@ local LIST_ITEM_COUNT = 10
 local list_min_index = 0
 
 local dancer = require("dancer")
+local music = require("background_music")
 
 function level_select:init()
 	self.sel_index = 0
@@ -27,6 +28,7 @@ end
 
 function level_select:update(dt)
 	dancer:update(dt)
+	music:update()
 end
 
 function level_select:keypressed( key )

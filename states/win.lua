@@ -1,6 +1,7 @@
 local utf8 = require("utf8")
 
 local win = {}
+local music = require("background_music")
 
 local highscores = require("highscores")
 
@@ -16,6 +17,9 @@ function win:init()
 end
 
 function win:enter()
+	music:stop()
+	music:play()
+
 	self.level = levels[states.game.current_level].title
 	self.time = states.game.timer
 	if highscores:good_enough(level, time) then
@@ -38,7 +42,7 @@ function win:resume()
 end
 
 function win:update(dt)
-
+	music.update()
 end
 
 function win:keypressed( key )
