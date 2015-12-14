@@ -54,6 +54,7 @@ function game:reset()
 end
 
 function game:load_level(lvl)
+	self.current_level = lvl
 	world = love.physics.newWorld(0, 200, true)
 	world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 

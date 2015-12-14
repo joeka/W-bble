@@ -227,6 +227,7 @@ function editor_save:init()
 end
 
 function editor_save:enter()
+	love.textinput = self.textinput
 	love.keyboard.setTextInput( true )
 end
 
@@ -238,7 +239,7 @@ function editor_save:update(dt)
 	
 end
 
-function love.textinput(t)
+function editor_save.textinput(t)
     editor_save.title = editor_save.title .. t
 end
 
