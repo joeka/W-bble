@@ -43,7 +43,7 @@ function editor:reset()
 	self.cam = camera()
 
 	self.level_id = nil
-	self.title = nil
+	self.title = ""
 end
 
 function editor:load( level )
@@ -314,11 +314,7 @@ function editor_save:init()
 	self.box.x = w/2 - self.box.w/2
 	self.box.y = h/2 - self.box.h/2
 
-	if editor.title then
-		self.title = editor.title
-	else
-		self.title = ""
-	end
+	self.title = editor.title
 end
 
 function editor_save:enter()
