@@ -49,7 +49,7 @@ function level_select:keypressed( key )
 end
 
 function level_select:draw()
-	love.graphics.print("SELECT LEVEL", LIST_PADDING_LEFT, LIST_PADDING_TOP - 40)
+	love.graphics.print("SELECT LEVEL (press 'e' to edit)", LIST_PADDING_LEFT, LIST_PADDING_TOP - 40)
 	self.list:draw(LIST_PADDING_LEFT, LIST_PADDING_TOP, LIST_WIDTH)
 	dancer:draw()
 end

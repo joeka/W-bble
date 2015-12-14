@@ -73,6 +73,7 @@ function editor:update(dt)
 			self.current_point = vector(wx,wy)
 		end
 	elseif self.moving_line then
+		if self.line_highlight == nil then return end
 		local wx, wy = self.cam:mousePosition()
 		local dx, dy = wx - self.line_move_current_pt.x, wy - self.line_move_current_pt.y
 		local line = self.lines[self.line_highlight]
@@ -108,6 +109,7 @@ function editor:keypressed( key )
 	elseif key == "delete" then
 		if self.line_highlight ~= nil then
 			table.remove(self.lines, self.line_highlight)
+			self.line_highlight = nil
 		end
 
 		local x, y = love.mouse.getPosition()
