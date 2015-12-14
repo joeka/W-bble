@@ -62,7 +62,8 @@ end
 
 function editor:update(dt)
 	if self.moving then
-		self.cam:move(self.current_pos.x - love.mouse.getX(), self.current_pos.y - love.mouse.getY())
+		local t = ( self.current_pos - vector(love.mouse.getX(), love.mouse.getY()) ) / self.cam.scale
+		self.cam:move(t.x, t.y)
 		self.current_pos = vector(love.mouse.getX(), love.mouse.getY())
 	elseif self.drawing then
 		local wx, wy = self.cam:mousePosition()
