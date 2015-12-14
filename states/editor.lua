@@ -173,18 +173,16 @@ function editor:mousepressed(x, y, button)
 		if obj then
 			self.current_point = vector(wx,wy)
 			self:move_object(obj)
+		elseif line then
+			self.line_highlight = line
+			self.line_move_current_pt = vector(self.cam:worldCoords(x,y))
+			self.moving_line = true
 		else
-			if line ~= nil then
-				self.line_highlight = line
-				self.line_move_current_pt = vector(x,y)
-				self.moving_line = true
-			else
-				self.line_highlight = nil
-				table.insert(self.current_line, wx)
-				table.insert(self.current_line, wy)
-				self.current_point = vector(wx, wy)
-				self.drawing = true
-			end
+			self.line_highlight = nil
+			table.insert(self.current_line, wx)
+			table.insert(self.current_line, wy)
+			self.current_point = vector(wx, wy)
+			self.drawing = true
 		end
 	elseif button == "r" then
 		self.current_pos = vector(x,y)
@@ -239,10 +237,6 @@ function editor:draw()
 	love.graphics.setLineStyle( "smooth" )
 	love.graphics.setLineWidth( 10 )
 
-	if (self.line_highlight ~= nil) then
-		love.graphics.print("Line highlight", 10, 10)
-	end
-
 	for i,line in pairs(self.lines) do
 		if (self.line_highlight ~= nil and self.line_highlight == i) then
 			love.graphics.setColor(255, 0, 255)
@@ -278,6 +272,10 @@ function editor:draw()
 
 	love.graphics.setColor( 255, 255, 255 )
 	love.graphics.print(keys_text, 40, h - 16)
+
+	if (self.line_highlight ~= nil) then
+		love.graphics.print("Line highlight", 10, 10)
+	end
 end
 
 
