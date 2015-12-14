@@ -7,7 +7,7 @@ local min_dist = 5
 
 local objects = require ("objects")
 
-local keys_text = "LMB: draw line / move object    RMB: move screen     DEL: delete object     +: zoom in     -:zoom out"
+local keys_text = "LMB: draw line / move object   RMB: move screen   DEL: delete object   +: zoom in   -:zoom out   n: new level"
 
 function editor:init()
 	self.backgroundImage = love.graphics.newImage("img/background.png")
@@ -113,7 +113,9 @@ function editor:keypressed( key )
 		local _, i = self:object_clicked(x, y, false)
 		if i then
 			table.remove(self.objects, i)
-		end 
+		end
+	elseif key == "r" or key == "n" then
+		self:reset()
 	end
 end
 
@@ -295,7 +297,7 @@ function editor:draw()
 	love.graphics.rectangle( "fill", 0,  h - 20, w - 100, 20 )
 
 	love.graphics.setColor( 255, 255, 255 )
-	love.graphics.print(keys_text, 40, h - 16)
+	love.graphics.print(keys_text, 20, h - 16)
 
 	if (self.line_highlight ~= nil) then
 		love.graphics.print("Line highlight", 10, 10)
